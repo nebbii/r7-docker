@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   db:
@@ -11,6 +10,13 @@ services:
     ports:
       - "5432:5432"
 
+  redis:
+    image: redis:7.0
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
   web:
     build: .
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails server -b 0.0.0.0"
@@ -20,8 +26,11 @@ services:
       - "3000:3000"
     depends_on:
       - db
+      - redis  
     environment:
       DATABASE_URL: postgresql://postgres:password@db:5432/app_development
+      REDIS_URL: redis://redis:6379/0  
 
 volumes:
   postgres_data:
+  redis_data:
